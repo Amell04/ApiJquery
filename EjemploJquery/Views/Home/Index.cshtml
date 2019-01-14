@@ -1,0 +1,173 @@
+﻿<div class="container">
+    <div class="row">
+        <div class="col-md-6">
+            <h2>Formulario de registro</h2>
+            <div class="form-group">
+                <form>
+                    <label for="">Id:</label>
+                    <input type="number" id="Id" placeholder="Coloque un numero.." class="form-control" required>
+
+                    <label for="">Nombre:</label>
+                    <input type="text" id="Nombre" placeholder="Digite solo los nombres..." class="form-control" required>
+
+                    <label for="">Apellidos</label>
+                    <input type="text" id="Apellidos" placeholder="Digite los apellidos..." class="form-control">
+
+                    <label for="">Fecha:</label>
+                    <input type="date" id="Fecha" class="form-control" required>
+
+                    <label for="">Direccion</label>
+                    <textarea name="" id="Direccion" cols="30" rows="10" class="form-control"></textarea>
+
+
+                    <label for="">Especialidad</label>
+                    <select id="Especialidad" class="form-control">
+                        <option value="Matematica">Matematica</option>
+                        <option value="Ingles">Ingles</option>
+                        <option value="Porgramacion">Programacion</option>
+                    </select>
+
+                    <br>
+                    <input type="button" id="Guardar" value="Guardar" class="btn btn-primary">
+                </form>
+            </div>
+        </div>
+        <div class="col-md-6">
+
+
+            <h1>Listado de docentes.</h1>
+            <table class="table table-hover">
+
+                <tr>
+                    <th>Nombre</th>
+                    <th>Apellidos</th>
+                    <th>Fecha</th>
+                    <th>Direccion</th>
+                    <th>Especialidad</th>
+            
+                </tr>
+
+                </tr>
+
+
+
+
+
+                <tbody id="resultado">
+                    <!--aqui cargara la informacion-->
+
+
+                </tbody>
+            </table>
+        </div>
+    </div>
+
+</div>
+
+<script>
+    $("document").ready(iniciar);
+
+    function iniciar() {
+        $("#Guardar").click(guardar);
+        $.ajax({
+            method: "Get",         
+            dataType: "json",
+            url: "http://localhost:60277/api/Docentes",
+            success: procesar,
+            error: error
+        });
+        return false;
+    }
+
+
+    function procesar(data) {
+        var rows;
+        for (i = 0; i < data.length; i++) {
+            rows = rows + " <tr><td>" + data[i].nombre + "</td> <td>" + data[i].apellido + "</td><td>" + data[i].fecha + "</td><td>" + data[i].direccion + "</td><td>" + data[i].especialidad + "<td><button class='btn btn-danger'onclick='eliminar(" + data[i].Iddocente + ")' >Eliminar</button></td></tr>";
+        }
+        $("#resultado").html(rows);
+    }
+
+    function error() {
+        alert("Error");
+        $("#resultado").html("<h2>Error de peticion</h2>");
+    }
+
+    function cargarDatos() {
+        $.ajax({
+            url: "http://localhost:60277/api/Docentes",
+            method: "Get",
+            success: consulta,
+            error: errorConsulta
+        });
+    }
+
+    function guardar() {
+        //recolectar informacion
+        var id = $("#Id").val();
+        var nombre = $("#Nombre").val();
+        var apellidos = $("#Apellidos").val();
+        var fecha = $("#Fecha").val();
+        var direccion = $("#Direccion").val();
+        var especialidad = $("#Especialidad").val();
+
+        //realizando la peticion para guardar
+        $.ajax({
+            method: "Post",
+            url: "http://localhost:60277/api/Docentes",
+            data: {
+                //datos del modelo->datos del formulario
+                iddocente: id,
+                nombre: nombre,
+                apellido: apellidos,
+                fecha: fecha,
+                direccion: direccion,
+                especialidad: especialidad
+            },
+            success: procesarGuardarr,
+            error: errorGuardar
+
+        });
+
+    }
+    function procesarGuardarr(data) {
+
+        //  if(data==1){
+        alert("Procesado");
+        iniciar();
+        /*  }else{
+              alert("No Procesado");
+          }*/
+
+    }
+    function errorGuardar() {
+        alert("Error al Guardar");
+    }
+
+    function eliminar(Iddocente) {
+        $.ajax({
+            method: "Delete",
+            url: "http://localhost:60277/api/Docentes/" + Iddocente,
+            data: {
+                Iddocente: Iddocente,
+            },
+            success: eliminarDatos,
+            error: error
+        });
+
+    }
+
+    function eliminarDatos() {
+        alert("Datos eliminados");
+        cargarDatos();
+       
+    }
+    function error() {
+        alert("Error al realizar la operacion");
+    }
+
+
+    //Eliminar
+
+
+</script>
